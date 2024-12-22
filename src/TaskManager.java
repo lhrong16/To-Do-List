@@ -330,7 +330,6 @@ public class TaskManager {
                     Collections.swap(taskArrayList, i, k);
                 }
                 k++;
-                System.out.println(k);
 
             }
         }
