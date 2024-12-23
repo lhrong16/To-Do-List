@@ -17,7 +17,9 @@ public class Main {
                              4. Delete a Task
                              5. View All Tasks
                              6. Search Tasks
-                             7. Save and Close
+                             7. Set Task Dependency
+                             8. Edit Task
+                             9. Save and Close
                              
                              """);
             System.out.print("Choose an option : ");
@@ -86,7 +88,14 @@ public class Main {
                     break;
                 case 6 :
                     task.searchTasks();
-                case 7:
+                    break;
+                case 7 :
+                    task.setTaskDependency();
+                    break;
+                case 8 :
+                    task.editTask();
+                    break;
+                case 9:
                     task.closeTaskManager();
                     System.exit(0);
                 default :
@@ -95,7 +104,6 @@ public class Main {
         }
         System.out.println();
     }
-
 }
 
 
