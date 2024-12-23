@@ -15,7 +15,7 @@ public class TaskManager {
         private String category;
         private String prioritylevel;
         private String recurrence;
-        private String dependencies;
+        private Task dependency;
         private boolean isComplete;
         private boolean recurrenceFlag;
 
@@ -26,7 +26,6 @@ public class TaskManager {
             category = c;
             prioritylevel = pl;
             recurrence = r;
-            //dependencies = d;
             isComplete = s;
             recurrenceFlag = rf;
         }
@@ -63,6 +62,14 @@ public class TaskManager {
             return recurrenceFlag;
         }
 
+        public Task getDependency() {
+            return dependency;
+        }
+
+        public void setDependency(Task dependency) {
+            this.dependency = dependency;
+        }
+
         public void markAsComplete() {
             isComplete = true;
         }
@@ -84,11 +91,12 @@ public class TaskManager {
                     "\nDescription : " + description +
                     (recurrenceFlag ?
                             "\nCategory : " + category +
-                            "\nRecurrence : " + recurrence :
+                                    "\nRecurrence : " + recurrence :
                             "\nDue Date : " + duedate +
-                            "\nStatus : " + (isComplete ? "Complete" : "Incomplete") +
-                            "\nCategory : " + category +
-                            "\nPriority Level : " + prioritylevel
+                                    "\nStatus : " + (isComplete ? "Complete" : "Incomplete") +
+                                    "\nCategory : " + category +
+                                    "\nPriority Level : " + prioritylevel +
+                                    (dependency != null ? "\n(Depends on \"" + dependency.getTitle() + "\")" : "")
                     );
         }
     }
@@ -105,19 +113,19 @@ public class TaskManager {
     public void addTask() {
         System.out.println("=== Add a New Task ===");
         System.out.println();
-        System.out.print("Enter task title : ");
+        System.out.print("Enter task title: ");
         String title = sc.nextLine();
-        System.out.print("Enter task description : ");
+        System.out.print("Enter task description: ");
         String description = sc.nextLine();
-        System.out.print("Enter due date (YYYY-MM-DD) : ");
+        System.out.print("Enter due date (YYYY-MM-DD): ");
         String duedate = sc.nextLine();
-        //check date format**
-        System.out.print("Enter task category (Homework, Personal, Work) : ");
+        // Check date format**
+        System.out.print("Enter task category (Homework, Personal, Work): ");
         String category = sc.nextLine();
-        //check category format**
-        System.out.print("Priority level (Low, Medium, High) : ");
+        // Check category format**
+        System.out.print("Priority level (Low, Medium, High): ");
         String prioritylevel = sc.nextLine();
-        //check priority format**
+        // Check priority format**
 
         Task newTask = new Task(title, description, duedate, category, prioritylevel, null, false, false);
         taskArrayList.add(newTask);
@@ -139,7 +147,7 @@ public class TaskManager {
         System.out.print("Enter recurrence interval (daily, weekly, monthly) : ");
         String recurrence = sc.nextLine();
 
-        Task recurringTask = new Task(title, category, null, category,null, recurrence, false, true);
+        Task recurringTask = new Task(title, description, null, category,null, recurrence, false, true);
         //recurringTask.isRecurrence();
         taskArrayList.add(recurringTask);
         System.out.println("Recurring Task \"" + title + "\" created successfully!");
@@ -184,8 +192,12 @@ public class TaskManager {
 
         if (taskNumber >= 1 && taskNumber <= taskArrayList.size()) {
             Task task = taskArrayList.get(taskNumber - 1);
-            task.markAsComplete();
-            System.out.println("Task \"" + task.getTitle() + "\" marked as complete!");
+            if (task.getDependency() != null && !task.getDependency().getStatus()) {
+                System.out.println("Warning: Task \"" + task.getTitle() + "\" cannot be marked as complete because it depends on \"" + task.getDependency().getTitle() + "\". Please complete \"" + task.getDependency().getTitle() + "\" first.");
+            } else {
+                task.markAsComplete();
+                System.out.println("Task \"" + task.getTitle() + "\" marked as complete!");
+            }
         } else {
             System.out.println("Invalid task number.");
         }
@@ -241,6 +253,32 @@ public class TaskManager {
         System.out.println();
     }
 
+
+
+    public void viewTasks() {
+        System.out.println("=== Task List ===");
+        System.out.println();
+
+        if (taskArrayList.isEmpty()) {
+            System.out.println("No task available.");
+            return;
+        }
+
+        for (int i = 0; i < taskArrayList.size(); i++) {
+            Task task = taskArrayList.get(i);
+            System.out.print((i + 1) + ". [" + (task.getStatus() ? "Complete" : "Incomplete") + "] " + task.getTitle() + ": " + task.getDescription());
+            if (task.getDueDate() != null) {
+                System.out.print(" - Due: " + task.getDueDate());
+            }
+            if (task.getDependency() != null) {
+                System.out.print(" (Depends on " + task.getDependency().getTitle() + ")");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
+    /*
     public void viewTasks() {
         System.out.println("=== Task List ===");
         System.out.println();
@@ -256,6 +294,7 @@ public class TaskManager {
             System.out.println();
         }
     }
+    */
 
     public void searchTasks() {
         System.out.println("=== Search Tasks ===");
@@ -300,12 +339,11 @@ public class TaskManager {
         sc.nextLine();
         System.out.println();
 
-        boolean ascending = false;
         switch (choice) {
             case 1 -> bubbleSortByDueDate(true);
             case 2 -> bubbleSortByDueDate(false);
-            case 3 -> bubbleSortByPriority(false);
-            case 4 -> bubbleSortByPriority(true);
+            case 3 -> bubbleSortByPriority(true);
+            case 4 -> bubbleSortByPriority(false);
             default -> System.out.println("Invalid choice.");
         }
     }
@@ -319,7 +357,7 @@ public class TaskManager {
 
                 // Debugging output
                 //System.out.printf("Comparing priorities: %s (%d) vs %s (%d)%n",
-                        //taskArrayList.get(j).getPriority(), priority1, taskArrayList.get(j + 1).getPriority(), priority2);
+                //taskArrayList.get(j).getPriority(), priority1, taskArrayList.get(j + 1).getPriority(), priority2);
 
                 if (priority1 == priority2) {
                     continue;
@@ -330,11 +368,6 @@ public class TaskManager {
                     //System.out.println("Swapped!");
                 }
             }
-        }
-
-        // Explicitly reverse for "High to Low"
-        if (!ascending) {
-            Collections.reverse(taskArrayList);
         }
 
         //System.out.println("Tasks sorted by Priority (" + (ascending ? "Low to High" : "High to Low") + "):");
@@ -387,6 +420,110 @@ public class TaskManager {
         }
         //System.out.println("Tasks sorted by Due Date " + (ascending ? "(Ascending)!" : "(Descending)!"));
     }
+
+    public void setTaskDependency() {
+        System.out.println("=== Set Task Dependency ===");
+
+        System.out.print("Enter task number that depends on another task: ");
+        int dependentTaskNumber = sc.nextInt();
+        sc.nextLine();
+        System.out.print("Enter the task number it depends on: ");
+        int dependencyTaskNumber = sc.nextInt();
+        sc.nextLine();
+
+        if (dependentTaskNumber >= 1 && dependentTaskNumber <= taskArrayList.size() &&
+                dependencyTaskNumber >= 1 && dependencyTaskNumber <= taskArrayList.size()) {
+            Task dependentTask = taskArrayList.get(dependentTaskNumber - 1);
+            Task dependencyTask = taskArrayList.get(dependencyTaskNumber - 1);
+            dependentTask.setDependency(dependencyTask);
+            System.out.println("Task \"" + dependentTask.getTitle() + "\" now depends on \"" + dependencyTask.getTitle() + "\".");
+        } else {
+            System.out.println("Invalid task number.");
+        }
+        System.out.println();
+    }
+
+
+    public void editTask() {
+        System.out.println("=== Edit Task ===");
+        System.out.println();
+
+        if (taskArrayList.isEmpty()) {
+            System.out.println("No tasks available to edit.");
+            return;
+        }
+
+        viewTasks();
+
+        System.out.print("Enter the task number you want to edit: ");
+        int taskNumber = sc.nextInt();
+        sc.nextLine();
+
+        if (taskNumber >= 1 && taskNumber <= taskArrayList.size()) {
+            Task task = taskArrayList.get(taskNumber - 1);
+            System.out.println("What would you like to edit?");
+            System.out.println("1. Title");
+            System.out.println("2. Description");
+            System.out.println("3. Due Date");
+            System.out.println("4. Category");
+            System.out.println("5. Priority");
+            System.out.println("6. Set Task Dependency");
+            System.out.println("7. Cancel");
+            System.out.print("> ");
+            int editChoice = sc.nextInt();
+            sc.nextLine();
+
+            switch (editChoice) {
+                case 1:
+                    System.out.print("Enter the new title: ");
+                    String newTitle = sc.nextLine();
+                    String oldTitle = task.title;
+                    task.title = newTitle;
+                    System.out.println("Task \"" + oldTitle + "\" has been updated to \"" + newTitle + "\".");
+                    break;
+                case 2:
+                    System.out.print("Enter the new description: ");
+                    String newDescription = sc.nextLine();
+                    String oldDescription = task.description;
+                    task.description = newDescription;
+                    System.out.println("Task \"" + oldDescription + "\" has been updated to \"" + newDescription + "\".");
+                    break;
+                case 3:
+                    System.out.print("Enter the new due date (YYYY-MM-DD): ");
+                    String newDueDate = sc.nextLine();
+                    String oldDueDate = task.duedate;
+                    task.duedate = newDueDate;
+                    System.out.println("Task \"" + oldDueDate + "\" has been updated to \"" + newDueDate + "\".");
+                    break;
+                case 4:
+                    System.out.print("Enter the new category: ");
+                    String newCategory = sc.nextLine();
+                    String oldCategory = task.category;
+                    task.category = newCategory;
+                    System.out.println("Task \"" + oldCategory + "\" has been updated to \"" + newCategory + "\".");
+                    break;
+                case 5:
+                    System.out.print("Enter the new priority: ");
+                    String newPriority = sc.nextLine();
+                    String oldPriority = task.prioritylevel;
+                    task.prioritylevel = newPriority;
+                    System.out.println("Task \"" + oldPriority + "\" has been updated to \"" + newPriority + "\".");
+                    break;
+                case 6:
+                    setTaskDependency();
+                    break;
+                case 7:
+                    System.out.println("Edit cancelled.");
+                    break;
+                default:
+                    System.out.println("Invalid choice.");
+            }
+        } else {
+            System.out.println("Invalid task number.");
+        }
+        System.out.println();
+    }
+
 
     public void closeTaskManager() {
         sql.clearSQL();
