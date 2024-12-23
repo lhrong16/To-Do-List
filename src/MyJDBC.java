@@ -4,6 +4,7 @@ public class MyJDBC {
     public void importSQL(TaskManager task) {
         try {
             Connection connection = DriverManager.getConnection(
+                    //change address and password to own
                     "jdbc:mysql://127.0.0.1:3306/list_schema",
                     "root",
                     "112233445566"
@@ -45,6 +46,7 @@ public class MyJDBC {
     public void exportSQL(String t, String d, String dd, String c, String pl, String r, boolean s, boolean rf){
         try {
             Connection connection = DriverManager.getConnection(
+                    //change address and password to own
                     "jdbc:mysql://127.0.0.1:3306/list_schema",
                     "root",
                     "112233445566"
@@ -67,6 +69,7 @@ public class MyJDBC {
     public void clearSQL () {
             try {
                 Connection connection = DriverManager.getConnection(
+                        //change address and password to own
                         "jdbc:mysql://127.0.0.1:3306/list_schema",
                         "root",
                         "112233445566"
