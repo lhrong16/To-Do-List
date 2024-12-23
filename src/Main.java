@@ -4,6 +4,7 @@ public class Main {
     public static void main(String[] args) {
         TaskManager task = new TaskManager();
         Scanner sc = new Scanner(System.in);
+        task.importSQL();
 
         boolean running = true;
         while (running) {
@@ -16,6 +17,7 @@ public class Main {
                              4. Delete a Task
                              5. View All Tasks
                              6. Search Tasks
+                             7. Save and Close
                              
                              """);
             System.out.print("Choose an option : ");
@@ -41,7 +43,7 @@ public class Main {
 
                     switch (choice) {
                         case 1 :
-                            task.createTask();
+                            task.addTask();
                             break;
                         case 2:
                             task.addRecurringTask();
@@ -84,12 +86,16 @@ public class Main {
                     break;
                 case 6 :
                     task.searchTasks();
+                case 7:
+                    task.closeTaskManager();
+                    System.exit(0);
                 default :
                     System.out.println("Invalid choice. Please try again.");
             }
         }
         System.out.println();
     }
+
 }
 
 
