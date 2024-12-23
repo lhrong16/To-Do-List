@@ -6,6 +6,8 @@ public class TaskManager {
     private Scanner sc = new Scanner(System.in);
     private ArrayList<Task> taskArrayList = new ArrayList<Task>();
 
+    MyJDBC sql = new MyJDBC();
+
     class Task {
         private String title;
         private String description;
@@ -13,29 +15,54 @@ public class TaskManager {
         private String category;
         private String prioritylevel;
         private String recurrence;
+        private String dependencies;
         private boolean isComplete;
         private boolean recurrenceFlag;
 
-        public Task(String t, String d, String dd, String c, String pl, String r) {
+        public Task(String t, String d, String dd, String c, String pl, String r, boolean s, boolean rf/*, String d*/) {
             title = t;
             description = d;
             duedate = dd;
             category = c;
             prioritylevel = pl;
             recurrence = r;
+            //dependencies = d;
+            isComplete = s;
+            recurrenceFlag = rf;
         }
 
-        public String getPriority() {
-            return prioritylevel;
+        public String getTitle() {
+            return title;
+        }
+
+        public String getDescription() {
+            return description;
         }
 
         public String getDueDate() {
             return duedate;
         }
 
-        public void isReccurence() {
-            recurrenceFlag = true;
+        public String getCategory() {
+            return category;
         }
+
+        public String getPriority() {
+            return prioritylevel;
+        }
+
+        public String getRecurrence() {
+            return recurrence;
+        }
+
+        public Boolean getStatus() {
+            return isComplete;
+        }
+
+        public Boolean getRecurrenceFlag() {
+            return recurrenceFlag;
+        }
+
         public void markAsComplete() {
             isComplete = true;
         }
@@ -64,13 +91,18 @@ public class TaskManager {
                             "\nPriority Level : " + prioritylevel
                     );
         }
-
-        public String getTitle() {
-            return title;
-        }
     }
 
-    public void createTask() {
+    public void importSQL(){
+        sql.importSQL(this);
+    }
+
+    public void importTasks(String t, String d, String dd, String c, String pl, String r, boolean s, boolean rf) {
+        Task sqlTask = new Task(t, d, dd, c, pl, r, s, rf);
+        taskArrayList.add(sqlTask);
+    }
+
+    public void addTask() {
         System.out.println("=== Add a New Task ===");
         System.out.println();
         System.out.print("Enter task title : ");
@@ -87,10 +119,30 @@ public class TaskManager {
         String prioritylevel = sc.nextLine();
         //check priority format**
 
-        Task newTask = new Task(title, description, duedate, category, prioritylevel, null);
+        Task newTask = new Task(title, description, duedate, category, prioritylevel, null, false, false);
         taskArrayList.add(newTask);
 
         System.out.println("Task \"" + title + "\" added successfully!");
+        System.out.println();
+    }
+
+    public void addRecurringTask() {
+        System.out.println("=== Add a Recurring Task ===");
+        System.out.println();
+        System.out.print("Enter task title : ");
+        String title = sc.nextLine();
+        System.out.print("Enter task description : ");
+        String description = sc.nextLine();
+        System.out.print("Enter task category (Homework, Personal, Work) : ");
+        String category = sc.nextLine();
+        //check format*
+        System.out.print("Enter recurrence interval (daily, weekly, monthly) : ");
+        String recurrence = sc.nextLine();
+
+        Task recurringTask = new Task(title, category, null, category,null, recurrence, false, true);
+        //recurringTask.isRecurrence();
+        taskArrayList.add(recurringTask);
+        System.out.println("Recurring Task \"" + title + "\" created successfully!");
         System.out.println();
     }
 
@@ -205,30 +257,10 @@ public class TaskManager {
         }
     }
 
-    public void addRecurringTask() {
-        System.out.println("=== Add a Recurring Task ===");
-        System.out.println();
-        System.out.print("Enter task title : ");
-        String title = sc.nextLine();
-        System.out.print("Enter task description : ");
-        String description = sc.nextLine();
-        System.out.print("Enter task category (Homework, Personal, Work) : ");
-        String category = sc.nextLine();
-        //check format*
-        System.out.print("Enter recurrence interval (daily, weekly, monthly) : ");
-        String recurrence = sc.nextLine();
-
-        Task recurringTask = new Task(title, category, null, category,null, recurrence);
-        recurringTask.isReccurence();
-        taskArrayList.add(recurringTask);
-        System.out.println("Recurring Task \"" + title + "\" created successfully!");
-        System.out.println();
-    }
-
     public void searchTasks() {
         System.out.println("=== Search Tasks ===");
         System.out.println();
-        System.out.print("Enter a keyword to search by title or description: ");
+        System.out.print("Enter a keyword to search by title or description : ");
         String keyword = sc.nextLine();
         ArrayList<Task> results = new ArrayList<>();
         for (Task task : taskArrayList) {
@@ -246,6 +278,7 @@ public class TaskManager {
             int i = 1;
             for (Task task : results) {
                 System.out.println("Task "+i+" :\n"+task);
+                System.out.println();
                 i++;
             }
         }
@@ -353,5 +386,20 @@ public class TaskManager {
             }
         }
         //System.out.println("Tasks sorted by Due Date " + (ascending ? "(Ascending)!" : "(Descending)!"));
+    }
+
+    public void closeTaskManager() {
+        sql.clearSQL();
+        for (Task task : taskArrayList) {
+            String t = task.getTitle();
+            String d = task.getDescription();
+            String dd = task.getDueDate();
+            String c = task.getCategory();
+            String pl = task.getPriority();
+            String r = task.getRecurrence();
+            Boolean s = task.getStatus();
+            Boolean rf = task.getRecurrenceFlag();
+            sql.exportSQL(t, d, dd, c ,pl ,r, s, rf);
+        }
     }
 }
