@@ -13,13 +13,12 @@ public class Main {
                              
                              1. Add a New Task
                              2. Mark Task as Complete
-                             3. Update Task Details
+                             3. Edit Task
                              4. Delete a Task
                              5. View All Tasks
                              6. Search Tasks
                              7. Set Task Dependency
-                             8. Edit Task
-                             9. Save and Close
+                             8. Save and Close
                              
                              """);
             System.out.print("Choose an option : ");
@@ -57,7 +56,7 @@ public class Main {
                     task.markTaskAsComplete();
                     break;
                 case 3 :
-                    task.updateTaskDetails();
+                    task.editTask();
                     break;
                 case 4 :
                     task.deleteTask();
@@ -92,10 +91,7 @@ public class Main {
                 case 7 :
                     task.setTaskDependency();
                     break;
-                case 8 :
-                    task.editTask();
-                    break;
-                case 9:
+                case 8:
                     task.closeTaskManager();
                     System.exit(0);
                 default :
