@@ -3,6 +3,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         TaskManager task = new TaskManager();
+        DataAnalytics analytics = new DataAnalytics(task);
         Scanner sc = new Scanner(System.in);
         task.importSQL();
 
@@ -18,7 +19,9 @@ public class Main {
                              5. View All Tasks
                              6. Search Tasks
                              7. Set Task Dependency
-                             8. Save and Close
+                             8. Delete Task Dependency
+                             9. Show Analytics Dashboard
+                             10. Save and Close
                              
                              """);
             System.out.print("Choose an option : ");
@@ -91,7 +94,13 @@ public class Main {
                 case 7 :
                     task.setTaskDependency();
                     break;
-                case 8:
+                case 8 :
+                    task.deleteTaskDependency();
+                    break;
+                case 9:
+                    analytics.showAnalyticsDashboard();
+                    break;
+                case 10:
                     task.closeTaskManager();
                     System.exit(0);
                 default :
@@ -101,5 +110,3 @@ public class Main {
         System.out.println();
     }
 }
-
-
