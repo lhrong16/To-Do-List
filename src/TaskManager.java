@@ -18,8 +18,9 @@ public class TaskManager {
         private Task dependency;
         private boolean isComplete;
         private boolean recurrenceFlag;
+        private int dependencyId;
 
-        public Task(String t, String d, String dd, String c, String pl, String r, boolean s, boolean rf/*, String d*/) {
+        public Task(String t, String d, String dd, String c, String pl, String r, boolean s, boolean rf, int depId) {
             title = t;
             description = d;
             duedate = dd;
@@ -28,6 +29,7 @@ public class TaskManager {
             recurrence = r;
             isComplete = s;
             recurrenceFlag = rf;
+            dependencyId = depId;
         }
 
         public String getTitle() {
@@ -86,6 +88,14 @@ public class TaskManager {
             duedate = due;
         }
 
+        public int getDependencyId() {
+            return dependencyId;
+        }
+
+        public void setDependencyId(int dependencyId) {
+            this.dependencyId = dependencyId;
+        }
+
         public String toString() {
             return "Title : " + title +
                     "\nDescription : " + description +
@@ -101,12 +111,16 @@ public class TaskManager {
         }
     }
 
+    public ArrayList<Task> getTaskArrayList() {
+        return taskArrayList;
+    }
+
     public void importSQL(){
         sql.importSQL(this);
     }
 
-    public void importTasks(String t, String d, String dd, String c, String pl, String r, boolean s, boolean rf) {
-        Task sqlTask = new Task(t, d, dd, c, pl, r, s, rf);
+    public void importTasks(String t, String d, String dd, String c, String pl, String r, boolean s, boolean rf, int depId) {
+        Task sqlTask = new Task(t, d, dd, c, pl, r, s, rf, depId);
         taskArrayList.add(sqlTask);
     }
 
@@ -127,7 +141,7 @@ public class TaskManager {
         String prioritylevel = sc.nextLine();
         // Check priority format**
 
-        Task newTask = new Task(title, description, duedate, category, prioritylevel, null, false, false);
+        Task newTask = new Task(title, description, duedate, category, prioritylevel, null, false, false, 0);
         taskArrayList.add(newTask);
 
         System.out.println("Task \"" + title + "\" added successfully!");
@@ -147,7 +161,7 @@ public class TaskManager {
         System.out.print("Enter recurrence interval (daily, weekly, monthly) : ");
         String recurrence = sc.nextLine();
 
-        Task recurringTask = new Task(title, description, null, category,null, recurrence, false, true);
+        Task recurringTask = new Task(title, description, null, category,null, recurrence, false, true, 0);
         //recurringTask.isRecurrence();
         taskArrayList.add(recurringTask);
         System.out.println("Recurring Task \"" + title + "\" created successfully!");
@@ -204,7 +218,8 @@ public class TaskManager {
         System.out.println();
     }
 
-    /*public void updateTaskDetails() {
+    /*
+    public void updateTaskDetails() {
         System.out.println("=== Update Task Details ===");
         System.out.println();
 
@@ -251,8 +266,8 @@ public class TaskManager {
             System.out.println("Invalid task number.");
         }
         System.out.println();
-    }*/
-
+    }
+    */
 
 
     public void viewTasks() {
@@ -444,6 +459,27 @@ public class TaskManager {
     }
 
 
+    public void deleteTaskDependency() {
+        System.out.println("=== Delete Task Dependency ===");
+        System.out.print("Enter the task number for which you want to delete the dependency: ");
+        int taskNumber = sc.nextInt();
+        sc.nextLine();
+
+        if (taskNumber >= 1 && taskNumber <= taskArrayList.size()) {
+            Task task = taskArrayList.get(taskNumber - 1);
+            if (task.getDependency() != null) {
+                task.setDependency(null);
+                System.out.println("Dependency for task \"" + task.getTitle() + "\" has been deleted.");
+            } else {
+                System.out.println("Task \"" + task.getTitle() + "\" does not have any dependency.");
+            }
+        } else {
+            System.out.println("Invalid task number.");
+        }
+        System.out.println();
+    }
+
+
     public void editTask() {
         System.out.println("=== Edit Task ===");
         System.out.println();
@@ -536,7 +572,8 @@ public class TaskManager {
             String r = task.getRecurrence();
             Boolean s = task.getStatus();
             Boolean rf = task.getRecurrenceFlag();
-            sql.exportSQL(t, d, dd, c ,pl ,r, s, rf);
+            int depId = task.getDependency() != null ? task.getDependency().getDependencyId() : 0;
+            sql.exportSQL(t, d, dd, c, pl, r, s, rf, depId);
         }
     }
 }
