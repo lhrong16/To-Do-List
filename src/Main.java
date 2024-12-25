@@ -3,9 +3,13 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         TaskManager task = new TaskManager();
-        DataAnalytics analytics = new DataAnalytics(task);
+        Mail mail = new Mail();
         Scanner sc = new Scanner(System.in);
+        DataAnalytics analytics = new DataAnalytics(task);
+        dateCheckThread dateCheck = new dateCheckThread(task, mail);
+
         task.importSQL();
+        task.importDependencies();
 
         boolean running = true;
         while (running) {
@@ -13,14 +17,14 @@ public class Main {
                              === Task Manager ===
                              
                              1. Add a New Task
-                             2. Mark Task as Complete
-                             3. Edit Task
-                             4. Delete a Task
-                             5. View All Tasks
-                             6. Search Tasks
-                             7. Set Task Dependency
-                             8. Delete Task Dependency
-                             9. Show Analytics Dashboard
+                             2. Edit Task
+                             3. Delete a Task
+                             4. Task Dependency
+                             5. Mark Task as Complete
+                             6. View All Tasks
+                             7. Search Tasks
+                             8. Show Analytics Dashboard
+                             9. Connect with Email
                              10. Save and Close
                              
                              """);
@@ -56,15 +60,37 @@ public class Main {
 
                     break;
                 case 2 :
-                    task.markTaskAsComplete();
-                    break;
-                case 3 :
                     task.editTask();
                     break;
-                case 4 :
+                case 3 :
                     task.deleteTask();
                     break;
+                case 4 :
+                    System.out.print("""
+                                     === Task Dependency ===
+                                     
+                                     1. Set dependency
+                                     2. Delete dependency
+                                     
+                                     """);
+                    System.out.print("Choose an option : ");
+                    choice = sc.nextInt();
+                    System.out.println();
+                    sc.nextLine();
+
+                    switch (choice) {
+                        case 1 :
+                            task.setTaskDependency();
+                            break;
+                        case 2:
+                            task.deleteTaskDependency();
+                            break;
+                    }
+                    break;
                 case 5 :
+                    task.markTaskAsComplete();
+                    break;
+                case 6 :
                     System.out.print("""
                                      === View All Tasks ===
                                      
@@ -88,19 +114,19 @@ public class Main {
                             break;
                     }
                     break;
-                case 6 :
+                case 7 :
                     task.searchTasks();
                     break;
-                case 7 :
-                    task.setTaskDependency();
-                    break;
                 case 8 :
-                    task.deleteTaskDependency();
-                    break;
-                case 9:
                     analytics.showAnalyticsDashboard();
                     break;
-                case 10:
+                case 9 :
+                    System.out.print("Enter Email Address : ");
+                    String email = sc.nextLine();
+                    mail.getEmail(email);
+                    dateCheck.start();
+                    break;
+                case 10 :
                     task.closeTaskManager();
                     System.exit(0);
                 default :
@@ -109,4 +135,5 @@ public class Main {
         }
         System.out.println();
     }
+
 }
