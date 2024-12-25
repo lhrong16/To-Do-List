@@ -4,7 +4,6 @@ public class MyJDBC {
     public void importSQL(TaskManager task) {
         try {
             Connection connection = DriverManager.getConnection(
-                    //change address and password to own
                     "jdbc:mysql://127.0.0.1:3306/list_schema",
                     "root",
                     "112233445566"
@@ -13,17 +12,18 @@ public class MyJDBC {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM list_schema.list");
 
-            while (resultSet.next()) {
-                String title = resultSet.getString("title");
-                String description = resultSet.getString("description");
-                String duedate = resultSet.getString("duedate");
-                String category = resultSet.getString("category");
-                String priority = resultSet.getString("priority");
-                String recurrence = resultSet.getString("recurrence");
-                boolean status = resultSet.getBoolean("status");
-                boolean recurrenceFlag = resultSet.getBoolean("recurrenceFlag");
-                int dependencyId = resultSet.getInt("dependencyId");
-                task.importTasks(title, description, duedate, category, priority, recurrence, status, recurrenceFlag, dependencyId);
+                while (resultSet.next()) {
+                    String title = resultSet.getString("title");
+                    String description = resultSet.getString("description");
+                    String duedate = resultSet.getString("duedate");
+                    String category = resultSet.getString("category");
+                    String priority = resultSet.getString("priority");
+                    String recurrence = resultSet.getString("recurrence");
+                    boolean status = resultSet.getBoolean("status");
+                    boolean recurrenceFlag = resultSet.getBoolean("recurrenceFlag");
+                    boolean emailFlag = resultSet.getBoolean("emailFlag");
+                    String dependencyID = resultSet.getString("depID");
+                    task.importTasks(title, description, duedate, category, priority, recurrence, status, recurrenceFlag, emailFlag, dependencyID);
 
 
                     /*System.out.println("Task "+resultSet.getString("idlist")+" : ");
@@ -36,18 +36,17 @@ public class MyJDBC {
                     System.out.println("Priority Level : "+resultSet.getString("priority"));
                     System.out.println("recurrenceFlag : "+resultSet.getBoolean("recurrenceFlag"));
                     System.out.println();*/
-            }
+                }
 
             connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
 
-    public void exportSQL(String t, String d, String dd, String c, String pl, String r, boolean s, boolean rf, int depId){
+    public void exportSQL(String t, String d, String dd, String c, String pl, String r, boolean s, boolean rf, boolean e, String depID) {
         try {
             Connection connection = DriverManager.getConnection(
-                    //change address and password to own
                     "jdbc:mysql://127.0.0.1:3306/list_schema",
                     "root",
                     "112233445566"
@@ -57,31 +56,33 @@ public class MyJDBC {
 
             int sInt = s ? 1 : 0;
             int rfInt = rf ? 1 : 0;
+            int eInt = e ? 1 : 0;
 
-            statement.executeUpdate("insert into list_schema.list" + "(title,description,duedate,category,priority,recurrence,status,recurrenceFlag,dependencyId)" + "values('"+t+"','"+d+"','"+dd+"','"+c+"','"+pl+"','"+r+"','"+sInt+"','"+rfInt+"','"+depId+"')");
+            statement.executeUpdate("insert into list_schema.list" + "(title,description,duedate,category,priority,recurrence,status,recurrenceFlag,emailFlag,depID)" + "values('"+t+"','"+d+"','"+dd+"','"+c+"','"+pl+"','"+r+"','"+sInt+"','"+rfInt+"','"+eInt+"','"+depID+"')");
             connection.close();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
+
     }
 
     public void clearSQL () {
-        try {
-            Connection connection = DriverManager.getConnection(
-                    //change address and password to own
-                    "jdbc:mysql://127.0.0.1:3306/list_schema",
-                    "root",
-                    "112233445566"
-            );
+            try {
+                Connection connection = DriverManager.getConnection(
+                        "jdbc:mysql://127.0.0.1:3306/list_schema",
+                        "root",
+                        "112233445566"
+                );
 
-            Statement statement = connection.createStatement();
+                Statement statement = connection.createStatement();
 
-            statement.executeUpdate("TRUNCATE list_schema.list");
-            connection.close();
+                statement.executeUpdate("TRUNCATE list_schema.list");
+                connection.close();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
-    }
+
 }
