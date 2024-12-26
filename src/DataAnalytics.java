@@ -14,7 +14,7 @@ public class DataAnalytics {
         int pendingTasks = 0;
         Map<String, Integer> categorySummary = new HashMap<>();
 
-        for (TaskManager.Task task : taskManager.getTaskArrayList()) {
+        for (Task task : taskManager.getTaskArrayList()) {
             if (task.getStatus()) {
                 completedTasks++;
             } else {
