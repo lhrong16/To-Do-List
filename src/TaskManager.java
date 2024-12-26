@@ -143,13 +143,13 @@ class Task {
         return "Title : " + title +
                 "\nDescription : " + description +
                 (recurrenceFlag ?
-                "\nCategory : " + category +
-                "\nRecurrence : " + recurrence :
-                "\nDue Date : " + duedate +
-                "\nStatus : " + (isComplete ? "Complete" : "Incomplete") +
-                "\nCategory : " + category +
-                "\nPriority Level : " + prioritylevel +
-                (dependencyArrayList != null ? "\n(Depends on task(s) " + getDependencyTitles() + ")": "")
+                        "\nCategory : " + category +
+                                "\nRecurrence : " + recurrence :
+                        "\nDue Date : " + duedate +
+                                "\nStatus : " + (isComplete ? "Complete" : "Incomplete") +
+                                "\nCategory : " + category +
+                                "\nPriority Level : " + prioritylevel +
+                                (dependencyArrayList != null ? "\n(Depends on task(s) " + getDependencyTitles() + ")": "")
                 );
     }
 }
@@ -174,6 +174,23 @@ public class TaskManager {
         taskArrayList.add(sqlTask);
     }
 
+
+    public void importDependencies() {
+        for (Task task : taskArrayList) {
+            if (task.getDependencyID() != null && !task.getDependencyID().isEmpty()) {
+                String[] depIdArrayList = task.getDependencyID().split(" ");
+                for (String depID : depIdArrayList) {
+                    if (depID != null && !depID.isEmpty()) {
+                        int depIdInt = Integer.parseInt(depID);
+                        task.setDependency(taskArrayList.get(depIdInt));
+                    }
+                }
+                task.resetDependencyID();
+            }
+        }
+    }
+
+    /*
     public void importDependencies() {
         for (Task task : taskArrayList) {
             if (!task.getDependencyID().isEmpty()) {
@@ -186,6 +203,8 @@ public class TaskManager {
             }
         }
     }
+    */
+
 
     public void addTask() {
         System.out.println("=== Add a New Task ===");
@@ -196,15 +215,19 @@ public class TaskManager {
         String description = sc.nextLine();
         System.out.print("Enter due date (YYYY-MM-DD) : ");
         String duedate = sc.nextLine();
-        while (!validate.validateDate(duedate)){
+        while (!validate.validateDate(duedate)) {
             System.out.print("Error! Please enter a valid date (YYYY-MM-DD) : ");
             duedate = sc.nextLine();
         }
         System.out.print("Enter task category (Homework, Personal, Work) : ");
         String category = sc.nextLine();
+        while (!validate.validateCategory(category)) {
+            System.out.print("Error! Please enter a valid category (Homework, Personal, Work) : ");
+            category = sc.nextLine();
+        }
         System.out.print("Priority level (Low, Medium, High) : ");
         String prioritylevel = sc.nextLine();
-        while(!validate.validatePriority(prioritylevel)){
+        while (!validate.validatePriority(prioritylevel)) {
             System.out.print("Error! Please enter a valid priority level (Low, Medium, High) : ");
             prioritylevel = sc.nextLine();
         }
@@ -216,6 +239,7 @@ public class TaskManager {
         System.out.println();
     }
 
+    
     public void addRecurringTask() {
         System.out.println("=== Add a Recurring Task ===");
         System.out.println();
@@ -225,16 +249,20 @@ public class TaskManager {
         String description = sc.nextLine();
         System.out.print("Enter task category (Homework, Personal, Work) : ");
         String category = sc.nextLine();
+        while (!validate.validateCategory(category)) {
+            System.out.print("Error! Please enter a valid category (Homework, Personal, Work) : ");
+            category = sc.nextLine();
+        }
         System.out.print("Enter recurrence interval (daily, weekly, monthly) : ");
         String recurrence = sc.nextLine();
 
-        Task recurringTask = new Task(title, category, null, category,null, recurrence, false, true, false, null);
-        //recurringTask.isRecurrence();
+        Task recurringTask = new Task(title, description, null, category, null, recurrence, false, true, false, null);
         taskArrayList.add(recurringTask);
         System.out.println("Recurring Task \"" + title + "\" created successfully!");
         System.out.println();
     }
 
+    
     public void setTaskDependency() {
         System.out.println("=== Set Task Dependency ===");
 
@@ -455,6 +483,7 @@ public class TaskManager {
         System.out.println();
     }
 
+
     public void deleteTask() {
         System.out.println("=== Delete a Task ===");
         System.out.println();
@@ -487,8 +516,10 @@ public class TaskManager {
                 }
             }
 
-            if (dependentTasks.charAt(dependentTasks.length()-2)==',') {
-                dependentTasks = dependentTasks.substring(0, dependentTasks.length()-2);
+            if(!dependentTasks.isEmpty()){
+                if (dependentTasks.charAt(dependentTasks.length()-2)==',') {
+                    dependentTasks = dependentTasks.substring(0, dependentTasks.length() - 2);
+                }
             }
 
             if (isDependency) {
@@ -842,7 +873,7 @@ public class TaskManager {
             Boolean s = task.getStatus();
             Boolean rf = task.getRecurrenceFlag();
             Boolean e = task.getEmailFlag();
-            String depID = task.getDependencyID();
+            String depID = task.getDependencyID() != null ? task.getDependencyID() : "";
             sql.exportSQL(t, d, dd, c ,pl ,r, s, rf, e, depID);
         }
     }
