@@ -20,4 +20,8 @@ public class ValidateInput {
     public boolean validatePriority (String priority){
         return priority.equalsIgnoreCase("High") || priority.equalsIgnoreCase("Medium") || priority.equalsIgnoreCase("Low");
     }
+
+    public boolean validateCategory(String category) {
+        return category.equalsIgnoreCase("Homework") || category.equalsIgnoreCase("Personal") || category.equalsIgnoreCase("Work");
+    }
 }
