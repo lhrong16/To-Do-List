@@ -21,7 +21,7 @@ public class DataAnalytics {
                 pendingTasks++;
             }
 
-            String category = task.getCategory();
+            String category = task.getCategory().toLowerCase();
             categorySummary.put(category, categorySummary.getOrDefault(category, 0) + 1);
         }
 
@@ -33,11 +33,11 @@ public class DataAnalytics {
         System.out.println("- Pending: " + pendingTasks);
         System.out.println("- Completion Rate: " + String.format("%.2f", completionRate) + "%");
         System.out.print("- Task Categories: ");
-        String[] categories = {"Homework", "Personal", "Work"};
+        String[] categories = {"homework", "personal", "work"};
         for (int i = 0; i < categories.length; i++) {
             String category = categories[i];
             if (categorySummary.containsKey(category)) {
-                System.out.print(category + ": " + categorySummary.get(category));
+                System.out.print(category.substring(0, 1).toUpperCase() + category.substring(1) + ": " + categorySummary.get(category));
                 if (i < categories.length - 1) {
                     System.out.print(", ");
                 }
