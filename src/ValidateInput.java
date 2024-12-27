@@ -1,7 +1,7 @@
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-//
+
 public class ValidateInput {
     public boolean validateDate (String date){
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
