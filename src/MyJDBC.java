@@ -25,17 +25,6 @@ public class MyJDBC {
                 String dependencyID = resultSet.getString("depID");
                 task.importTasks(title, description, duedate, category, priority, recurrence, status, recurrenceFlag, emailFlag, dependencyID);
 
-
-                    /*System.out.println("Task "+resultSet.getString("idlist")+" : ");
-                    System.out.println("Title : "+resultSet.getString("title"));
-                    System.out.println("Description : "+resultSet.getString("description"));
-                    System.out.println("Due Date : "+resultSet.getString("duedate"));
-                    System.out.println("Status : "+resultSet.getBoolean("status"));
-                    System.out.println("Category : "+resultSet.getString("category"));
-                    System.out.println("recurrence : "+resultSet.getString("recurrence"));
-                    System.out.println("Priority Level : "+resultSet.getString("priority"));
-                    System.out.println("recurrenceFlag : "+resultSet.getBoolean("recurrenceFlag"));
-                    System.out.println();*/
             }
 
             connection.close();
