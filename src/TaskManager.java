@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
+import java.time.LocalDate;
+
 
 class Task {
     private String title;
@@ -190,21 +192,6 @@ public class TaskManager {
         }
     }
 
-    /*
-    public void importDependencies() {
-        for (Task task : taskArrayList) {
-            if (!task.getDependencyID().isEmpty()) {
-                String[] depIdArrayList = task.getDependencyID().split(" ");
-                for (String depID : depIdArrayList){
-                    int depIdInt = Integer.parseInt(depID);
-                    task.setDependency(taskArrayList.get(depIdInt));
-                    task.resetDependencyID();
-                }
-            }
-        }
-    }
-    */
-
 
     public void addTask() {
         System.out.println("=== Add a New Task ===");
@@ -239,7 +226,7 @@ public class TaskManager {
         System.out.println();
     }
 
-    
+
     public void addRecurringTask() {
         System.out.println("=== Add a Recurring Task ===");
         System.out.println();
@@ -256,13 +243,31 @@ public class TaskManager {
         System.out.print("Enter recurrence interval (daily, weekly, monthly) : ");
         String recurrence = sc.nextLine();
 
-        Task recurringTask = new Task(title, description, null, category, null, recurrence, false, true, false, null);
+        String dueDate = calculateNewDueDate(recurrence);
+
+        Task recurringTask = new Task(title, description, dueDate, category, null, recurrence, false, true, false, null);
         taskArrayList.add(recurringTask);
-        System.out.println("Recurring Task \"" + title + "\" created successfully!");
+        System.out.println("Recurring Task \"" + title + "\" created successfully with due date: " + dueDate);
         System.out.println();
+
     }
 
-    
+
+    private String calculateNewDueDate(String recurrence) {
+        LocalDate currentDate = LocalDate.now();
+        switch (recurrence.toLowerCase()) {
+            case "daily":
+                return currentDate.plusDays(1).toString();
+            case "weekly":
+                return currentDate.plusWeeks(1).toString();
+            case "monthly":
+                return currentDate.plusMonths(1).toString();
+            default:
+                return currentDate.toString();
+        }
+    }
+
+
     public void setTaskDependency() {
         System.out.println("=== Set Task Dependency ===");
 
@@ -558,6 +563,8 @@ public class TaskManager {
         System.out.println();
     }
 
+
+
     public void markTaskAsComplete() {
         System.out.println("=== Mark Task as Complete ===");
         System.out.println();
@@ -574,21 +581,21 @@ public class TaskManager {
             Task task = taskArrayList.get(taskNumber - 1);
             boolean allDependencyCompleted = true;
 
-            if (task.getDependencyArrayList() != null){
-                for (Task dependency : task.getDependencyArrayList()){
-                    if (!dependency.getStatus()){
+            if (task.getDependencyArrayList() != null) {
+                for (Task dependency : task.getDependencyArrayList()) {
+                    if (!dependency.getStatus()) {
                         allDependencyCompleted = false;
                         break;
                     }
                 }
             }
 
-            if (!allDependencyCompleted){
+            if (!allDependencyCompleted) {
                 String notCompletedDependency = "";
 
-                for (int i = 0; i<task.getDependencyArrayList().size(); i++) {
+                for (int i = 0; i < task.getDependencyArrayList().size(); i++) {
                     Task dependency = task.getDependencyArrayList().get(i);
-                    if (!dependency.getStatus()){
+                    if (!dependency.getStatus()) {
                         notCompletedDependency += "\"" + dependency.getTitle() + "\"";
                     }
                     if (i + 1 != task.getDependencyArrayList().size()) {
@@ -600,6 +607,14 @@ public class TaskManager {
             } else {
                 task.markAsComplete();
                 System.out.println("Task \"" + task.getTitle() + "\" marked as complete!");
+
+                // Check if the task is a recurring task
+                if (task.getRecurrenceFlag()) {
+                    String newDueDate = calculateNewDueDate(task.getDueDate(), task.getRecurrence());
+                    Task newRecurringTask = new Task(task.getTitle(), task.getDescription(), newDueDate, task.getCategory(), task.getPriority(), task.getRecurrence(), false, true, false, task.getDependencyID());
+                    taskArrayList.add(newRecurringTask);
+                    System.out.println("New recurring task created with due date: " + newDueDate);
+                }
             }
         } else {
             System.out.println("Invalid task number.");
@@ -607,80 +622,21 @@ public class TaskManager {
         System.out.println();
     }
 
-    /*public void markTaskAsComplete() {
-        System.out.println("=== Mark Task as Complete ===");
-        System.out.println();
-        if (taskArrayList.isEmpty()) {
-            System.out.println("No tasks available to mark.");
-            return;
+
+    private String calculateNewDueDate(String currentDueDate, String recurrence) {
+        LocalDate currentDate = LocalDate.parse(currentDueDate);
+        switch (recurrence.toLowerCase()) {
+            case "daily":
+                return currentDate.plusDays(1).toString();
+            case "weekly":
+                return currentDate.plusWeeks(1).toString();
+            case "monthly":
+                return currentDate.plusMonths(1).toString();
+            default:
+                return currentDate.toString();
         }
-        viewTasks();
-        System.out.print("Enter the task number you want to mark as complete : ");
-        int taskNumber = sc.nextInt();
-        sc.nextLine();
+    }
 
-        if (taskNumber >= 1 && taskNumber <= taskArrayList.size()) {
-            Task task = taskArrayList.get(taskNumber - 1);
-            task.markAsComplete();
-            System.out.println("Task \"" + task.getTitle() + "\" marked as complete!");
-        } else {
-            System.out.println("Invalid task number.");
-        }
-        System.out.println();
-    }*/
-
-    /*public void updateTaskDetails() {
-        System.out.println("=== Update Task Details ===");
-        System.out.println();
-
-        if (taskArrayList.isEmpty()) {
-            System.out.println("No tasks available to update.");
-            return;
-        }
-
-        viewTasks();
-
-        System.out.print("Enter the task number you want to update : ");
-        int taskNumber = sc.nextInt();
-
-        sc.nextLine();
-        System.out.println();
-
-        if (taskNumber >= 1 && taskNumber <= taskArrayList.size()) {
-            Task task = taskArrayList.get(taskNumber - 1);
-            System.out.println("1. Update Description.");
-            System.out.println("2. Update Due Date.");
-            System.out.println();
-            System.out.print("Choose an option : ");
-            int updatechoice = sc.nextInt();
-            sc.nextLine();
-
-            switch (updatechoice) {
-                case 1:
-                    System.out.print("Enter new description : ");
-                    String newdescription = sc.nextLine();
-                    task.updateDescription(newdescription);
-                    System.out.println("Task description update successfully!");
-                    break;
-                case 2:
-                    System.out.print("Enter new due date (YYYY-MM-DD) : ");
-                    String newduedate = sc.nextLine();
-                    while (!validate.validateDate(newduedate)){
-                        System.out.print("Error! Please enter a valid date (YYYY-MM-DD) : ");
-                        newduedate = sc.nextLine();
-                    }
-                    task.updateDueDate(newduedate);
-                    System.out.println("Task due date updated successfully!");
-                    break;
-                default:
-                    System.out.println("Invalid choice.");
-            }
-        }
-        else {
-            System.out.println("Invalid task number.");
-        }
-        System.out.println();
-    }*/
 
     public void viewTasks() {
         System.out.println("=== Task List ===");
@@ -706,26 +662,10 @@ public class TaskManager {
     }
 
 
-    /*public void viewTasks() {
-        System.out.println("=== Task List ===");
-        System.out.println();
-
-        if (taskArrayList.isEmpty()) {
-            System.out.println("No task available.");
-            return;
-        }
-
-        for (int i = 0; i < taskArrayList.size(); i++) {
-            System.out.println("Task " + (i + 1) + " : ");
-            System.out.println(taskArrayList.get(i));
-            System.out.println();
-        }
-    }*/
-
     public void searchTasks() {
         System.out.println("=== Search Tasks ===");
         System.out.println();
-        System.out.print("Enter a keyword to search by title or description : ");
+        System.out.print("Enter a keyword to search by title or description: ");
         String keyword = sc.nextLine();
         ArrayList<Task> results = new ArrayList<>();
         for (Task task : taskArrayList) {
@@ -742,12 +682,16 @@ public class TaskManager {
 
             int i = 1;
             for (Task task : results) {
-                System.out.println("Task "+i+" :\n"+task);
-                System.out.println();
+                System.out.println(i + ". [" + (task.getStatus() ? "Complete" : "Incomplete") + "] " + task.getTitle() +
+                        " - Due: " + (task.getDueDate() != null ? task.getDueDate() : "N/A") +
+                        " - Category: " + task.getCategory() +
+                        " - Priority: " + task.getPriority());
                 i++;
             }
         }
+        System.out.println();
     }
+
 
     public void sortTasks() {
         System.out.print("""
@@ -781,9 +725,6 @@ public class TaskManager {
                 int priority1 = getPriorityValue(taskArrayList.get(j).getPriority());
                 int priority2 = getPriorityValue(taskArrayList.get(j + 1).getPriority());
 
-                // Debugging output
-                //System.out.printf("Comparing priorities: %s (%d) vs %s (%d)%n",
-                //taskArrayList.get(j).getPriority(), priority1, taskArrayList.get(j + 1).getPriority(), priority2);
 
                 if (priority1 == priority2) {
                     continue;
@@ -791,13 +732,9 @@ public class TaskManager {
 
                 if ((ascending && priority1 > priority2) || (!ascending && priority1 < priority2)) {
                     Collections.swap(taskArrayList, j, j + 1);
-                    //System.out.println("Swapped!");
                 }
             }
         }
-
-        //System.out.println("Tasks sorted by Priority (" + (ascending ? "Low to High" : "High to Low") + "):");
-        //taskArrayList.forEach(System.out::println);
     }
 
     private static int getPriorityValue(String priority) {
@@ -844,8 +781,8 @@ public class TaskManager {
                 }
             }
         }
-        //System.out.println("Tasks sorted by Due Date " + (ascending ? "(Ascending)!" : "(Descending)!"));
     }
+
 
     public void closeTaskManager() {
         sql.clearSQL();
