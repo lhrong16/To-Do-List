@@ -27,7 +27,8 @@ class Task {
         isComplete = s;
         recurrenceFlag = rf;
         emailFlag = e;
-        dependencyID = depIDs;
+        //dependencyID = depIDs;
+        dependencyID = depIDs != null ? depIDs : "";
     }
 
     public String getTitle() {
@@ -154,6 +155,16 @@ class Task {
                                 (dependencyArrayList != null ? "\n(Depends on task(s) " + getDependencyTitles() + ")": "")
                 );
     }
+
+    public String toFormattedString() {
+        return "Title : " + title + "  " +
+                "Description : " + description + "  " +
+                "Due Date : " + duedate + "  " +
+                "Status : " + (isComplete ? "Complete" : "Incomplete") + "  " +
+                "Category : " + category + "  " +
+                "Priority Level : " + prioritylevel + "  " +
+                (dependencyArrayList != null ? "(Depends on task(s) " + getDependencyTitles() + ")" : "");
+    }
 }
 
 public class TaskManager {
@@ -224,6 +235,13 @@ public class TaskManager {
 
         System.out.println("Task \"" + title + "\" added successfully!");
         System.out.println();
+    }
+
+
+    public void addTask(String title, String description, String dueDate, String category, String priority) {
+        Task newTask = new Task(title, description, dueDate, category, priority, null, false, false, false, null);
+        taskArrayList.add(newTask);
+        System.out.println("Task \"" + title + "\" added successfully!");
     }
 
 
@@ -563,6 +581,12 @@ public class TaskManager {
         System.out.println();
     }
 
+    public void deleteTask(int index) {
+        if (index >= 0 && index < taskArrayList.size()) {
+            Task removedTask = taskArrayList.remove(index);
+            System.out.println("Task \"" + removedTask.getTitle() + "\" deleted successfully!");
+        }
+    }
 
 
     public void markTaskAsComplete() {
@@ -622,6 +646,13 @@ public class TaskManager {
         System.out.println();
     }
 
+    public void markTaskAsComplete(int index) {
+        if (index >= 0 && index < taskArrayList.size()) {
+            Task task = taskArrayList.get(index);
+            task.markAsComplete();
+            System.out.println("Task \"" + task.getTitle() + "\" marked as complete!");
+        }
+    }
 
     private String calculateNewDueDate(String currentDueDate, String recurrence) {
         LocalDate currentDate = LocalDate.parse(currentDueDate);
@@ -690,6 +721,15 @@ public class TaskManager {
             }
         }
         System.out.println();
+    }
+
+
+    public void sortTasks(boolean ascending) {
+        if (ascending) {
+            bubbleSortByDueDate(true);
+        } else {
+            bubbleSortByDueDate(false);
+        }
     }
 
 
